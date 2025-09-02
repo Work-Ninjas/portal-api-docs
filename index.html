@@ -50,44 +50,6 @@
             color: white;
         }
         
-        .sdk-badges {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        .sdk-badge {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
-            transition: all 0.2s;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .sdk-badge:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            text-decoration: none;
-            color: white;
-        }
-        
-        .sdk-badge.typescript {
-            background: rgba(49, 120, 198, 0.3);
-        }
-        
-        .sdk-badge.python {
-            background: rgba(255, 212, 59, 0.3);
-        }
         
         .elements-container {
             height: calc(100vh - 200px);
@@ -188,14 +150,6 @@
     <div class="header">
         <h1>🚀 Portal API Documentation</h1>
         <p>Interactive Playground with Try It functionality</p>
-        <div class="sdk-badges">
-            <a href="./docs/quickstarts.md" class="sdk-badge typescript">
-                📦 TypeScript SDK
-            </a>
-            <a href="./docs/quickstarts.md" class="sdk-badge python">
-                🐍 Python SDK
-            </a>
-        </div>
         <div id="api-status" class="status-badge">🔄 Checking API Status...</div>
     </div>
 

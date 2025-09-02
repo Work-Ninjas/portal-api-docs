@@ -5,17 +5,43 @@ info:
     Portal API provides secure access to contact, job, and file management resources.
     This API uses bearer token authentication and multi-tenant architecture.
     
+    ## Authentication
+    
+    The Portal API uses Bearer Token authentication. Include your API key in the `Authorization` header:
+    
+    ```
+    Authorization: Bearer your_api_key_here
+    ```
+    
+    **Important**: Keep your API key secure and never expose it in client-side code.
+    
+    ## Getting Your API Key
+    
+    1. Log in to [DataHub Portal](https://datahubportal.com)
+    2. Go to **Settings** → **API Keys**
+    3. Click **"Generate New API Key"**
+    4. Copy and securely store your key (it won't be shown again)
+    5. Set the key as an environment variable: `API_KEY=your_key`
+    
+    **Need help?** See the complete [API Key Guide](./docs/getting-api-key.md)
+    
+    ## Rate Limits
+    
+    - **Per Client**: 420 requests/minute (burst: 60/30s)
+    - **Per IP**: 60 requests/minute (burst: 30/30s)  
+    - **Files Endpoint**: 120 requests/minute per client
+    - **Daily Quota**: 100,000 requests per client
+    
+    Rate limit headers are included in responses:
+    - `X-RateLimit-Limit`: Request limit per window
+    - `X-RateLimit-Remaining`: Remaining requests in window
+    - `X-RateLimit-Reset`: Time when the rate limit resets
+    
     ## Official SDKs
     
     - **TypeScript/JavaScript**: [@datahubportal/portal-api](https://www.npmjs.com/package/@datahubportal/portal-api)
     - **Python**: [datahub-portal-api](https://pypi.org/project/datahub-portal-api)
-    - **Quickstarts**: [SDK Documentation](https://docs.datahubportal.com/quickstarts)
-    
-    ## Getting Started
-    
-    1. Get your API key from [DataHub Portal](https://datahubportal.com)
-    2. Install an official SDK or use the interactive playground
-    3. Review the [Getting API Key guide](https://docs.datahubportal.com/getting-api-key)
+    - **Quickstarts**: [SDK Documentation](./docs/quickstarts.md)
   version: 1.0.0
   contact:
     name: API Support
