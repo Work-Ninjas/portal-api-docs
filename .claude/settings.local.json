@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(spectral lint:*)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(timeout 15s npm run dev:gate-c)",
+      "Bash(timeout 10s npm run dev:gate-c)",
+      "Bash(timeout 30s npm run dev:gate-c)",
+      "Bash(npm run dev:gate-c:*)",
+      "Bash(NODE_ENV=production npm run dev:gate-c)",
+      "Bash(PORT=3001 npm run dev:gate-c)",
+      "Bash(chmod:*)",
+      "Bash(az account:*)",
+      "Bash(az:*)",
+      "Bash(APPINSIGHTS_CONN=\"InstrumentationKey=7b8c025c-41bd-4f63-966a-7551802d0361;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=765ea885-ce40-4a0c-aea9-af1158b5a7ad\")",
+      "Bash(APPINSIGHTS_ID=\"/subscriptions/c4c5770f-c9b4-49db-ae81-fae53703aef5/resourceGroups/rg-data-migration-portal-prod/providers/microsoft.insights/components/portal-api-insights\")",
+      "Bash(ACTION_GROUP_ID=\"/subscriptions/c4c5770f-c9b4-49db-ae81-fae53703aef5/resourceGroups/rg-data-migration-portal-prod/providers/microsoft.insights/actiongroups/portal-api-alerts\")",
+      "Bash(\"/d/portal-api/azure/check-dns-status.sh\")",
+      "Bash(gh:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

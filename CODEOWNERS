@@ -1,0 +1,7 @@
+# CODEOWNERS (replace with real GitHub users or teams)
+
+*         @henry-github  @claude-github  @architect-github
+/docs/    @henry-github  @claude-github
+/openapi/ @claude-github @henry-github
+/adr/     @henry-github
+.github/  @henry-github

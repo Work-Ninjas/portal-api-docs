@@ -1,0 +1,63 @@
+{
+  "name": "Portal API Documentation",
+  "slug": "portal-api",
+  "type": "docs",
+  "version": "1.0.0-alpha",
+  "description": "Portal API documentation and reference",
+  "navigation": [
+    {
+      "title": "Getting Started",
+      "items": [
+        {"title": "Quick Start", "uri": "/docs/quick-start.md"},
+        {"title": "Overview", "uri": "/docs/overview.md"},
+        {"title": "Authentication & Tenancy", "uri": "/docs/auth-tenancy.md"}
+      ]
+    },
+    {
+      "title": "API Conventions",
+      "items": [
+        {"title": "Global Conventions", "uri": "/docs/global-conventions.md"},
+        {"title": "Error Model", "uri": "/docs/error-model.md"},
+        {"title": "Rate Limiting", "uri": "/docs/rate-limiting.md"},
+        {"title": "Security", "uri": "/docs/security.md"}
+      ]
+    },
+    {
+      "title": "API Reference",
+      "items": [
+        {"title": "OpenAPI Specification", "uri": "/openapi/openapi.yaml"}
+      ]
+    },
+    {
+      "title": "Resources",
+      "items": [
+        {"title": "Contacts - List", "uri": "/docs/resources-contacts.md"},
+        {"title": "Contacts - Get by ID", "uri": "/docs/resources-contacts-by-id.md"},
+        {"title": "Jobs", "uri": "/docs/resources-jobs.md"},
+        {"title": "Files", "uri": "/docs/resources-files.md"}
+      ]
+    },
+    {
+      "title": "Data Models",
+      "items": [
+        {"title": "Data Models", "uri": "/docs/data-models.md"}
+      ]
+    },
+    {
+      "title": "Developer Guide",
+      "items": [
+        {"title": "Mocking & Testing", "uri": "/docs/mocking-testing.md"},
+        {"title": "Observability", "uri": "/docs/observability.md"},
+        {"title": "Style Guide", "uri": "/docs/style-guide.md"}
+      ]
+    },
+    {
+      "title": "Support",
+      "items": [
+        {"title": "Versioning & Deprecations", "uri": "/docs/versioning-deprecations.md"},
+        {"title": "Support & SLA", "uri": "/docs/support-sla.md"},
+        {"title": "Changelog", "uri": "/docs/changelog-page.md"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+name: Bug report
+description: Report an issue with documentation, spec, or mocks
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe current vs. expected behavior.
+      placeholder: When linting openapi.yaml...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce the bug?
+  - type: input
+    id: version
+    attributes:
+      label: Version/commit
+      description: Tag, SHA or branch
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional notes
