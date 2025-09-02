@@ -20,7 +20,7 @@ servers:
     description: Local development server
 
 security:
-  - bearerAuth: []
+  - BearerAuth: []
 
 tags:
   - name: Contacts
@@ -38,6 +38,37 @@ paths:
       summary: List contacts
       description: Returns a paginated list of contacts for the authenticated tenant
       operationId: listContacts
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X GET "https://api.datahubportal.com/v1/contacts?limit=25" \
+              -H "Authorization: Bearer YOUR_API_TOKEN" \
+              -H "Content-Type: application/json"
+        - lang: javascript
+          source: |
+            const response = await fetch('https://api.datahubportal.com/v1/contacts?limit=25', {
+              method: 'GET',
+              headers: {
+                'Authorization': 'Bearer YOUR_API_TOKEN',
+                'Content-Type': 'application/json'
+              }
+            });
+            const data = await response.json();
+        - lang: python
+          source: |
+            import requests
+            
+            headers = {
+                'Authorization': 'Bearer YOUR_API_TOKEN',
+                'Content-Type': 'application/json'
+            }
+            
+            response = requests.get(
+                'https://api.datahubportal.com/v1/contacts',
+                params={'limit': 25},
+                headers=headers
+            )
+            data = response.json()
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
@@ -410,9 +441,10 @@ paths:
 
 components:
   securitySchemes:
-    bearerAuth:
+    BearerAuth:
       type: http
       scheme: bearer
+      bearerFormat: APIKey
       description: API key authentication using Bearer token
 
   parameters:

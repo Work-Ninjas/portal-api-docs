@@ -19,7 +19,11 @@
       "Bash(APPINSIGHTS_ID=\"/subscriptions/c4c5770f-c9b4-49db-ae81-fae53703aef5/resourceGroups/rg-data-migration-portal-prod/providers/microsoft.insights/components/portal-api-insights\")",
       "Bash(ACTION_GROUP_ID=\"/subscriptions/c4c5770f-c9b4-49db-ae81-fae53703aef5/resourceGroups/rg-data-migration-portal-prod/providers/microsoft.insights/actiongroups/portal-api-alerts\")",
       "Bash(\"/d/portal-api/azure/check-dns-status.sh\")",
-      "Bash(gh:*)"
+      "Bash(gh:*)",
+      "Bash(CONTAINER_APP_ID=\"/subscriptions/c4c5770f-c9b4-49db-ae81-fae53703aef5/resourceGroups/rg-data-migration-portal-prod/providers/Microsoft.App/containerapps/portal-api-prod\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
