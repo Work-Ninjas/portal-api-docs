@@ -58,24 +58,22 @@ paths:
               -H "Authorization: Bearer ${API_KEY}" \
               "https://api.datahubportal.com/v1/contacts?limit=25&offset=0&q=john"
         - lang: JavaScript
-          label: Fetch (with basic 429 backoff)
+          label: Fetch (with 429 backoff)
           source: |
             const BASE = "https://api.datahubportal.com/v1";
             const API_KEY = process.env.API_KEY;
 
-            async function fetchWithRetry(url, init = {}, attempts = 3) {
+            async function fetchWithRetry(url, attempts = 3) {
               const res = await fetch(url, {
-                ...init,
                 headers: {
                   "Authorization": `Bearer ${API_KEY}`,
-                  "Content-Type": "application/json",
-                  ...(init.headers || {})
+                  "Content-Type": "application/json"
                 }
               });
               if (res.status === 429 && attempts > 0) {
                 const retryAfter = Number(res.headers.get("Retry-After") || 1);
                 await new Promise(r => setTimeout(r, retryAfter * 1000));
-                return fetchWithRetry(url, init, attempts - 1);
+                return fetchWithRetry(url, attempts - 1);
               }
               if (!res.ok) throw new Error(`HTTP ${res.status}`);
               return res.json();
@@ -92,20 +90,47 @@ paths:
             BASE = "https://api.datahubportal.com/v1"
             API_KEY = os.environ["API_KEY"]
 
-            def get_contacts(limit=25, offset=0, q=None, attempts=3):
+            def list_contacts(limit=25, offset=0, q=None, attempts=3):
                 params = {"limit": limit, "offset": offset}
                 if q: params["q"] = q
-                headers = {"Authorization": f"Bearer {API_KEY}"}
-                resp = requests.get(f"{BASE}/contacts", headers=headers, params=params)
-                if resp.status_code == 429 and attempts > 0:
-                    retry_after = int(resp.headers.get("Retry-After", "1"))
+                r = requests.get(f"{BASE}/contacts", headers={"Authorization": f"Bearer {API_KEY}"}, params=params)
+                if r.status_code == 429 and attempts > 0:
+                    retry_after = int(r.headers.get("Retry-After", "1"))
                     time.sleep(retry_after)
-                    return get_contacts(limit, offset, q, attempts-1)
-                resp.raise_for_status()
-                print(resp.headers.get("X-RateLimit-Remaining"))
-                return resp.json()
+                    return list_contacts(limit, offset, q, attempts-1)
+                r.raise_for_status()
+                return r.json()
 
-            print(get_contacts(q="john"))
+            print(list_contacts(q="john"))
+        - lang: TypeScript
+          label: TypeScript SDK
+          source: |
+            import { Configuration, ContactsApi } from "@datahubportal/portal-api";
+
+            const config = new Configuration({
+              basePath: "https://api.datahubportal.com/v1",
+              accessToken: process.env.API_KEY!, // Bearer
+            });
+            const contacts = new ContactsApi(config);
+
+            (async () => {
+              const resp = await contacts.listContacts({ limit: 25, q: "john" });
+              console.log(resp.data?.length);
+            })();
+        - lang: Python
+          label: Python SDK
+          source: |
+            from datahub_portal_api import Configuration, ApiClient
+            from datahub_portal_api.api.contacts_api import ContactsApi
+
+            cfg = Configuration()
+            cfg.host = "https://api.datahubportal.com/v1"
+            cfg.access_token = "YOUR_API_KEY"  # Bearer
+
+            with ApiClient(cfg) as client:
+                api = ContactsApi(client)
+                resp = api.list_contacts(limit=25, q="john")
+                print(len(resp.data.data))
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
@@ -210,8 +235,7 @@ paths:
           label: Get contact by ID
           source: |
             CONTACT_ID="11111111-1111-1111-1111-111111111111"
-            curl -s \
-              -H "Authorization: Bearer ${API_KEY}" \
+            curl -s -H "Authorization: Bearer ${API_KEY}" \
               "https://api.datahubportal.com/v1/contacts/${CONTACT_ID}"
         - lang: JavaScript
           label: Fetch
@@ -224,14 +248,8 @@ paths:
               const res = await fetch(`${BASE}/contacts/${CONTACT_ID}`, {
                 headers: { "Authorization": `Bearer ${API_KEY}` }
               });
-              if (res.status === 400) {
-                console.error("Invalid UUID format");
-                return;
-              }
-              if (res.status === 404) {
-                console.error("Contact not found");
-                return;
-              }
+              if (res.status === 400) console.error("Invalid UUID format");
+              if (res.status === 404) console.error("Contact not found");
               if (!res.ok) throw new Error(`HTTP ${res.status}`);
               console.log(await res.json());
             })();
@@ -243,12 +261,35 @@ paths:
             API_KEY = os.environ["API_KEY"]
             CONTACT_ID = "11111111-1111-1111-1111-111111111111"
 
-            resp = requests.get(f"{BASE}/contacts/{CONTACT_ID}",
-                                headers={"Authorization": f"Bearer {API_KEY}"})
-            if resp.status_code in (400, 404):
-                print(resp.json())  # Problem Details
-            resp.raise_for_status()
-            print(resp.json())
+            r = requests.get(f"{BASE}/contacts/{CONTACT_ID}",
+                             headers={"Authorization": f"Bearer {API_KEY}"})
+            if r.status_code in (400, 404):
+                print(r.json())  # Problem Details
+            r.raise_for_status()
+            print(r.json())
+        - lang: TypeScript
+          label: TypeScript SDK
+          source: |
+            import { Configuration, ContactsApi } from "@datahubportal/portal-api";
+            const api = new ContactsApi(new Configuration({
+              basePath: "https://api.datahubportal.com/v1",
+              accessToken: process.env.API_KEY!,
+            }));
+            (async () => {
+              const res = await api.getContactById({ id: "11111111-1111-1111-1111-111111111111" });
+              console.log(res.id);
+            })();
+        - lang: Python
+          label: Python SDK
+          source: |
+            from datahub_portal_api import Configuration, ApiClient
+            from datahub_portal_api.api.contacts_api import ContactsApi
+
+            cfg = Configuration(); cfg.host = "https://api.datahubportal.com/v1"; cfg.access_token = "YOUR_API_KEY"
+            with ApiClient(cfg) as client:
+                api = ContactsApi(client)
+                res = api.get_contact_by_id(id="11111111-1111-1111-1111-111111111111")
+                print(res.id)
       parameters:
         - name: id
           in: path
@@ -330,8 +371,7 @@ paths:
         - lang: curl
           label: List jobs by status
           source: |
-            curl -s \
-              -H "Authorization: Bearer ${API_KEY}" \
+            curl -s -H "Authorization: Bearer ${API_KEY}" \
               "https://api.datahubportal.com/v1/jobs?status=in_progress&limit=10&sort=created_at&dir=desc"
         - lang: JavaScript
           label: Fetch (handles 429)
@@ -363,11 +403,34 @@ paths:
             import os, requests
             BASE = "https://api.datahubportal.com/v1"
             API_KEY = os.environ["API_KEY"]
-            params = {"status": "in_progress", "limit": 10, "sort": "created_at", "dir": "desc"}
+            params = {"status":"in_progress","limit":10,"sort":"created_at","dir":"desc"}
             r = requests.get(f"{BASE}/jobs", params=params,
                              headers={"Authorization": f"Bearer {API_KEY}"})
             r.raise_for_status()
             print([j["status"] for j in r.json()["data"]])
+        - lang: TypeScript
+          label: TypeScript SDK
+          source: |
+            import { Configuration, JobsApi } from "@datahubportal/portal-api";
+            const api = new JobsApi(new Configuration({
+              basePath: "https://api.datahubportal.com/v1",
+              accessToken: process.env.API_KEY!,
+            }));
+            (async () => {
+              const res = await api.listJobs({ status: "in_progress", limit: 5 });
+              console.log(res.data?.map(j => j.status));
+            })();
+        - lang: Python
+          label: Python SDK
+          source: |
+            from datahub_portal_api import Configuration, ApiClient
+            from datahub_portal_api.api.jobs_api import JobsApi
+
+            cfg = Configuration(); cfg.host = "https://api.datahubportal.com/v1"; cfg.access_token = "YOUR_API_KEY"
+            with ApiClient(cfg) as client:
+                api = JobsApi(client)
+                res = api.list_jobs(status="in_progress", limit=5)
+                print([j.status for j in res.data.data])
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
@@ -470,11 +533,10 @@ paths:
       operationId: getJobFiles
       x-codeSamples:
         - lang: curl
-          label: List files for a job (documents)
+          label: List files (documents)
           source: |
             JOB_ID="22222222-2222-2222-2222-222222222222"
-            curl -s \
-              -H "Authorization: Bearer ${API_KEY}" \
+            curl -s -H "Authorization: Bearer ${API_KEY}" \
               "https://api.datahubportal.com/v1/jobs/${JOB_ID}/files?kind=document&limit=5"
         - lang: JavaScript
           label: Fetch (respect no-store)
@@ -501,11 +563,34 @@ paths:
             API_KEY = os.environ["API_KEY"]
             JOB_ID = "22222222-2222-2222-2222-222222222222"
             r = requests.get(f"{BASE}/jobs/{JOB_ID}/files",
-                             params={"kind": "document", "limit": 5},
+                             params={"kind":"document","limit":5},
                              headers={"Authorization": f"Bearer {API_KEY}"})
             r.raise_for_status()
             files = r.json()["data"]
             print(files[0]["signed_url"], files[0]["expires_at"])
+        - lang: TypeScript
+          label: TypeScript SDK
+          source: |
+            import { Configuration, FilesApi } from "@datahubportal/portal-api";
+            const api = new FilesApi(new Configuration({
+              basePath: "https://api.datahubportal.com/v1",
+              accessToken: process.env.API_KEY!,
+            }));
+            (async () => {
+              const res = await api.getJobFiles({ jobId: "22222222-2222-2222-2222-222222222222", kind: "document", limit: 2 });
+              console.log(res.data?.[0]?.signed_url);
+            })();
+        - lang: Python
+          label: Python SDK
+          source: |
+            from datahub_portal_api import Configuration, ApiClient
+            from datahub_portal_api.api.files_api import FilesApi
+
+            cfg = Configuration(); cfg.host = "https://api.datahubportal.com/v1"; cfg.access_token = "YOUR_API_KEY"
+            with ApiClient(cfg) as client:
+                api = FilesApi(client)
+                res = api.get_job_files(job_id="22222222-2222-2222-2222-222222222222", kind="document", limit=2)
+                print(res.data.data[0].signed_url)
       parameters:
         - name: jobId
           in: path
