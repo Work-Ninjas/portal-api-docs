@@ -69,7 +69,7 @@ tags:
     description: File and document management
 
 paths:
-  /v1/contacts:
+  /contacts:
     get:
       tags:
         - Contacts
@@ -249,7 +249,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /v1/contacts/{id}:
+  /contacts/{id}:
     get:
       tags:
         - Contacts
@@ -386,7 +386,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /v1/jobs:
+  /jobs:
     get:
       tags:
         - Jobs
@@ -550,7 +550,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /v1/jobs/{jobId}/files:
+  /jobs/{jobId}/files:
     get:
       tags:
         - Files
