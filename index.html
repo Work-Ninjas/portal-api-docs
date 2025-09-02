@@ -90,13 +90,8 @@
         }
         
         .elements-container {
-            min-height: calc(100vh - 200px);
-            overflow: auto;
-        }
-        
-        #redoc-container {
-            height: 100%;
-            width: 100%;
+            height: calc(100vh - 200px);
+            overflow: hidden;
         }
         
         .footer {
@@ -214,12 +209,13 @@
             id="docs"
             apiDescriptionUrl="/openapi/openapi.yaml"
             router="hash"
-            layout="stacked"
+            layout="sidebar"
             hideSchemas="false"
             hideDownloadButton="false"
             hideExport="false"
+            hideRequestSamples="false"
+            hideResponseSamples="false"
             tryItCorsProxy=""
-            showCodeSamples="true"
             logo="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>"
         />
     </div>
@@ -278,11 +274,23 @@
         document.addEventListener('DOMContentLoaded', () => {
             const elementsApi = document.getElementById('docs');
             
-            // Force show code samples after load
-            setTimeout(() => {
-                // Force visible code samples
-                const codeSamples = document.querySelectorAll('[class*="code"], [class*="sample"], [class*="CodeSample"]');
-                console.log('Code samples found:', codeSamples.length);
+            // Multiple attempts to find and show code samples
+            function findCodeSamples(attempt = 1) {
+                const selectors = [
+                    '[class*="code"]',
+                    '[class*="sample"]', 
+                    '[class*="CodeSample"]',
+                    '[class*="request-sample"]',
+                    '[class*="RequestSample"]',
+                    '[data-testid*="code"]',
+                    '[data-testid*="sample"]',
+                    '.sl-panel__content pre',
+                    'elements-api [role="tabpanel"]'
+                ];
+                
+                const allSelectors = selectors.join(', ');
+                const codeSamples = document.querySelectorAll(allSelectors);
+                console.log(`Attempt ${attempt} - Code samples found:`, codeSamples.length);
                 
                 if (codeSamples.length > 0) {
                     console.log('✅ Code samples loaded with Stoplight Elements!');
@@ -291,15 +299,23 @@
                         sample.style.display = 'block';
                         sample.style.visibility = 'visible';
                     });
+                    return true;
+                } else if (attempt < 4) {
+                    // Try again with longer delay
+                    setTimeout(() => findCodeSamples(attempt + 1), 2000 * attempt);
                 } else {
-                    console.warn('⚠️ Still no code samples found. Checking again...');
-                    // Try again after more time
-                    setTimeout(() => {
-                        const retryCodeSamples = document.querySelectorAll('[class*="code"], [class*="sample"], [class*="CodeSample"]');
-                        console.log('Retry - Code samples found:', retryCodeSamples.length);
-                    }, 3000);
+                    console.warn('⚠️ No code samples found after multiple attempts');
+                    // Log the DOM structure for debugging
+                    const elementsContent = document.querySelector('elements-api');
+                    if (elementsContent) {
+                        console.log('Elements API shadow DOM:', elementsContent);
+                    }
                 }
-            }, 4000); // Give Elements more time to load
+                return false;
+            }
+            
+            // Start checking after Elements loads
+            setTimeout(() => findCodeSamples(1), 2000);
         });
     </script>
 </body>
