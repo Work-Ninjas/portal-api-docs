@@ -6,8 +6,8 @@
     <title>Portal API Documentation - Interactive Playground</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
     
-    <!-- Stoplight Elements CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements@8.1.4/styles.min.css">
+    <!-- Redoc CSS -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
     
     <style>
         body {
@@ -90,8 +90,13 @@
         }
         
         .elements-container {
-            height: calc(100vh - 200px);
-            overflow: hidden;
+            min-height: calc(100vh - 200px);
+            overflow: auto;
+        }
+        
+        #redoc-container {
+            height: 100%;
+            width: 100%;
         }
         
         .footer {
@@ -169,21 +174,15 @@
             opacity: 1;
         }
         
-        /* Custom Stoplight Elements styling */
-        elements-api {
-            --elements-primary-color: #667eea;
-            --elements-accent-color: #764ba2;
+        /* Custom Redoc styling */
+        .redoc-wrap {
+            font-family: 'Roboto', sans-serif;
         }
         
-        /* Force code samples to be visible */
-        .CodeSamples, .CodeSample, .code-samples {
-            display: block !important;
-            visibility: visible !important;
-        }
-        
-        /* Ensure code tabs are visible */
-        .CodeSampleTabs, .code-sample-tabs {
-            display: flex !important;
+        /* Code sample tabs styling */
+        .redoc-json .tab-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
         }
     </style>
 </head>
@@ -208,19 +207,7 @@
     </a>
 
     <div class="elements-container">
-        <elements-api
-            id="docs"
-            apiDescriptionUrl="/openapi/openapi.yaml"
-            router="hash"
-            layout="sidebar"
-            hideTryIt="false"
-            hideSchemas="false"
-            hideExport="false"
-            hideCodeSamples="false"
-            hideRequestExamples="false"
-            hideResponseExamples="false"
-            logo="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>"
-        />
+        <div id="redoc-container"></div>
     </div>
 
     <footer class="footer">
@@ -238,8 +225,8 @@
         </div>
     </footer>
 
-    <!-- Stoplight Elements JS -->
-    <script src="https://unpkg.com/@stoplight/elements@8.1.4/web-components.min.js"></script>
+    <!-- Redoc JS -->
+    <script src="https://cdn.redoc.ly/redoc/2.1.3/bundles/redoc.standalone.js"></script>
     
     <script>
         // Check API health status
@@ -273,32 +260,54 @@
             setInterval(checkAPIHealth, 5 * 60 * 1000);
         });
 
-        // Configure Stoplight Elements when it's ready
+        // Initialize Redoc when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            const elements = document.getElementById('docs');
+            // Initialize Redoc with custom configuration
+            Redoc.init('/openapi/openapi.yaml', {
+                scrollYOffset: 60,
+                theme: {
+                    colors: {
+                        primary: {
+                            main: '#667eea'
+                        }
+                    },
+                    typography: {
+                        fontSize: '14px',
+                        lineHeight: '1.5em',
+                        code: {
+                            fontSize: '13px',
+                            fontFamily: 'Courier, monospace'
+                        },
+                        headings: {
+                            fontFamily: 'Montserrat, sans-serif',
+                            fontWeight: '600'
+                        }
+                    },
+                    sidebar: {
+                        width: '260px'
+                    }
+                },
+                hideHostname: false,
+                expandResponses: '200,201',
+                requiredPropsFirst: true,
+                sortPropsAlphabetically: true,
+                showExtensions: true,
+                hideDownloadButton: false,
+                disableSearch: false,
+                onlyRequiredInSamples: false,
+                codeSampleLanguages: ['curl', 'javascript', 'python']
+            }, document.getElementById('redoc-container'));
             
-            // Force code samples to be visible
-            elements.setAttribute('hideCodeSamples', 'false');
-            elements.setAttribute('hideRequestExamples', 'false');
-            elements.setAttribute('hideResponseExamples', 'false');
-            
-            // Add custom event listeners for Try It functionality
-            elements.addEventListener('request-started', (event) => {
-                console.log('API request started:', event.detail);
-            });
-            
-            elements.addEventListener('request-finished', (event) => {
-                console.log('API request completed:', event.detail);
-            });
-            
-            // Check if code samples loaded after a short delay
+            // Check if code samples loaded after initialization
             setTimeout(() => {
-                const codeSamples = document.querySelectorAll('.CodeSamples, .code-samples');
+                const codeSamples = document.querySelectorAll('[class*="code"], [class*="sample"]');
                 console.log('Code samples found:', codeSamples.length);
-                if (codeSamples.length === 0) {
-                    console.warn('Code samples not found. This may be a Stoplight Elements configuration issue.');
+                if (codeSamples.length > 0) {
+                    console.log('✅ Code samples successfully loaded with Redoc!');
+                } else {
+                    console.warn('⚠️ Code samples still not found after Redoc initialization.');
                 }
-            }, 3000);
+            }, 2000);
         });
     </script>
 </body>
