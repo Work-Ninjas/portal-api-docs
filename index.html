@@ -6,8 +6,8 @@
     <title>Portal API Documentation - Interactive Playground</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
     
-    <!-- Redoc CSS -->
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+    <!-- Stoplight Elements CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements@7.15.3/styles.min.css">
     
     <style>
         body {
@@ -174,15 +174,18 @@
             opacity: 1;
         }
         
-        /* Custom Redoc styling */
-        .redoc-wrap {
-            font-family: 'Roboto', sans-serif;
+        /* Stoplight Elements customization */
+        elements-api {
+            --elements-primary-color: #667eea;
+            --elements-accent-color: #764ba2;
         }
         
-        /* Code sample tabs styling */
-        .redoc-json .tab-header {
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
+        /* Ensure code samples are visible */
+        elements-api::part(code-sample),
+        elements-api [class*="CodeSample"],
+        elements-api [class*="code-sample"] {
+            display: block !important;
+            visibility: visible !important;
         }
     </style>
 </head>
@@ -207,7 +210,18 @@
     </a>
 
     <div class="elements-container">
-        <div id="redoc-container"></div>
+        <elements-api
+            id="docs"
+            apiDescriptionUrl="/openapi/openapi.yaml"
+            router="hash"
+            layout="stacked"
+            hideSchemas="false"
+            hideDownloadButton="false"
+            hideExport="false"
+            tryItCorsProxy=""
+            showCodeSamples="true"
+            logo="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>"
+        />
     </div>
 
     <footer class="footer">
@@ -225,8 +239,8 @@
         </div>
     </footer>
 
-    <!-- Redoc JS -->
-    <script src="https://cdn.redoc.ly/redoc/2.1.3/bundles/redoc.standalone.js"></script>
+    <!-- Stoplight Elements JS -->
+    <script src="https://unpkg.com/@stoplight/elements@7.15.3/web-components.min.js"></script>
     
     <script>
         // Check API health status
@@ -260,54 +274,32 @@
             setInterval(checkAPIHealth, 5 * 60 * 1000);
         });
 
-        // Initialize Redoc when DOM is ready
+        // Wait for Stoplight Elements to load and check code samples
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Redoc with custom configuration
-            Redoc.init('/openapi/openapi.yaml', {
-                scrollYOffset: 60,
-                theme: {
-                    colors: {
-                        primary: {
-                            main: '#667eea'
-                        }
-                    },
-                    typography: {
-                        fontSize: '14px',
-                        lineHeight: '1.5em',
-                        code: {
-                            fontSize: '13px',
-                            fontFamily: 'Courier, monospace'
-                        },
-                        headings: {
-                            fontFamily: 'Montserrat, sans-serif',
-                            fontWeight: '600'
-                        }
-                    },
-                    sidebar: {
-                        width: '260px'
-                    }
-                },
-                hideHostname: false,
-                expandResponses: '200,201',
-                requiredPropsFirst: true,
-                sortPropsAlphabetically: true,
-                showExtensions: true,
-                hideDownloadButton: false,
-                disableSearch: false,
-                onlyRequiredInSamples: false,
-                codeSampleLanguages: ['curl', 'javascript', 'python']
-            }, document.getElementById('redoc-container'));
+            const elementsApi = document.getElementById('docs');
             
-            // Check if code samples loaded after initialization
+            // Force show code samples after load
             setTimeout(() => {
-                const codeSamples = document.querySelectorAll('[class*="code"], [class*="sample"]');
+                // Force visible code samples
+                const codeSamples = document.querySelectorAll('[class*="code"], [class*="sample"], [class*="CodeSample"]');
                 console.log('Code samples found:', codeSamples.length);
+                
                 if (codeSamples.length > 0) {
-                    console.log('✅ Code samples successfully loaded with Redoc!');
+                    console.log('✅ Code samples loaded with Stoplight Elements!');
+                    // Make sure they're visible
+                    codeSamples.forEach(sample => {
+                        sample.style.display = 'block';
+                        sample.style.visibility = 'visible';
+                    });
                 } else {
-                    console.warn('⚠️ Code samples still not found after Redoc initialization.');
+                    console.warn('⚠️ Still no code samples found. Checking again...');
+                    // Try again after more time
+                    setTimeout(() => {
+                        const retryCodeSamples = document.querySelectorAll('[class*="code"], [class*="sample"], [class*="CodeSample"]');
+                        console.log('Retry - Code samples found:', retryCodeSamples.length);
+                    }, 3000);
                 }
-            }, 2000);
+            }, 4000); // Give Elements more time to load
         });
     </script>
 </body>
