@@ -51,8 +51,83 @@
         }
         
         .elements-container {
-            height: calc(100vh - 120px);
+            height: calc(100vh - 200px);
             overflow: hidden;
+        }
+        
+        .footer {
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: #3b82f6;
+            text-decoration: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s;
+        }
+        
+        .footer-links a:hover {
+            background: #dbeafe;
+            text-decoration: none;
+        }
+        
+        .report-issue {
+            position: fixed;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            background: #ef4444;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            text-decoration: none;
+            font-size: 1.25rem;
+            z-index: 1000;
+            transition: all 0.2s;
+        }
+        
+        .report-issue:hover {
+            background: #dc2626;
+            transform: translateY(-50%) scale(1.05);
+            text-decoration: none;
+            color: white;
+        }
+        
+        .report-issue:after {
+            content: "Report Issue";
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            margin-right: 0.5rem;
+        }
+        
+        .report-issue:hover:after {
+            opacity: 1;
         }
         
         /* Custom Stoplight Elements styling */
@@ -69,6 +144,11 @@
         <div id="api-status" class="status-badge">🔄 Checking API Status...</div>
     </div>
 
+    <!-- Floating Report Issue Button -->
+    <a href="https://github.com/Work-Ninjas/portal-api-docs/issues" target="_blank" class="report-issue" title="Report an issue with documentation">
+        🐛
+    </a>
+
     <div class="elements-container">
         <elements-api
             id="docs"
@@ -81,6 +161,20 @@
             logo="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>"
         />
     </div>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="https://github.com/Work-Ninjas/portal-api-docs/issues" target="_blank">📝 Report Issue</a>
+            <a href="mailto:api-support@datahubportal.com">📧 Email Support</a>
+            <a href="https://github.com/Work-Ninjas/portal-api" target="_blank">🔗 API Source</a>
+            <a href="https://api.datahubportal.com/v1/health" target="_blank">💚 API Status</a>
+            <a href="https://datahubportal.com/terms" target="_blank">📋 Terms</a>
+        </div>
+        <div>
+            Portal API Documentation • Response time: 24h (business days) • 
+            <a href="mailto:api-support@datahubportal.com">api-support@datahubportal.com</a>
+        </div>
+    </footer>
 
     <!-- Stoplight Elements JS -->
     <script src="https://unpkg.com/@stoplight/elements@8.0.5/web-components.min.js"></script>

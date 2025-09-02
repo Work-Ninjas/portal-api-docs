@@ -1,0 +1,122 @@
+name: SDK Regeneration Trigger
+
+on:
+  push:
+    branches: [main]
+    paths: 
+      - 'openapi/openapi.yaml'
+  workflow_dispatch:
+    inputs:
+      sdk_type:
+        description: 'SDK to regenerate'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+        - typescript
+        - python
+        - both
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'rc'
+        type: choice
+        options:
+        - rc
+        - patch
+        - minor
+        - major
+
+jobs:
+  trigger-sdk-releases:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Calculate next versions
+      id: versions
+      run: |
+        # Get current versions from package files or use defaults
+        TS_VERSION="1.0.0-rc.1"
+        PY_VERSION="1.0.0rc1"
+        
+        # Simple version bumping logic
+        if [ "${{ github.event.inputs.version_bump }}" = "rc" ]; then
+          # Extract current RC number and increment
+          TS_RC=$(echo $TS_VERSION | grep -o 'rc\.[0-9]*' | grep -o '[0-9]*' || echo "0")
+          PY_RC=$(echo $PY_VERSION | grep -o 'rc[0-9]*' | grep -o '[0-9]*' || echo "0")
+          
+          NEW_TS_RC=$((TS_RC + 1))
+          NEW_PY_RC=$((PY_RC + 1))
+          
+          TS_VERSION="1.0.0-rc.${NEW_TS_RC}"
+          PY_VERSION="1.0.0rc${NEW_PY_RC}"
+        fi
+        
+        echo "ts_version=${TS_VERSION}" >> $GITHUB_OUTPUT
+        echo "py_version=${PY_VERSION}" >> $GITHUB_OUTPUT
+        
+    - name: Validate OpenAPI spec
+      run: |
+        npm install -g @stoplight/spectral-cli
+        spectral lint openapi/openapi.yaml
+        
+    - name: Trigger TypeScript SDK Release
+      if: github.event.inputs.sdk_type == 'typescript' || github.event.inputs.sdk_type == 'both' || github.event_name == 'push'
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const response = await github.rest.actions.createWorkflowDispatch({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'sdk-typescript.yml',
+            ref: 'main',
+            inputs: {
+              version: '${{ steps.versions.outputs.ts_version }}'
+            }
+          });
+          console.log('Triggered TypeScript SDK workflow:', response.status);
+          
+    - name: Trigger Python SDK Release  
+      if: github.event.inputs.sdk_type == 'python' || github.event.inputs.sdk_type == 'both' || github.event_name == 'push'
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const response = await github.rest.actions.createWorkflowDispatch({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'sdk-python.yml',
+            ref: 'main',
+            inputs: {
+              version: '${{ steps.versions.outputs.py_version }}'
+            }
+          });
+          console.log('Triggered Python SDK workflow:', response.status);
+          
+    - name: Create summary
+      run: |
+        echo "## 🚀 SDK Regeneration Triggered" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "The following SDKs will be regenerated:" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [[ "${{ github.event.inputs.sdk_type }}" == "typescript" ]] || [[ "${{ github.event.inputs.sdk_type }}" == "both" ]] || [[ "${{ github.event_name }}" == "push" ]]; then
+          echo "- **TypeScript SDK**: v${{ steps.versions.outputs.ts_version }}" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [[ "${{ github.event.inputs.sdk_type }}" == "python" ]] || [[ "${{ github.event.inputs.sdk_type }}" == "both" ]] || [[ "${{ github.event_name }}" == "push" ]]; then
+          echo "- **Python SDK**: v${{ steps.versions.outputs.py_version }}" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Monitor the [Actions tab](https://github.com/${{ github.repository }}/actions) for progress." >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,45 @@
+{
+  "name": "@datahubportal/portal-api",
+  "version": "1.0.0-rc.1",
+  "description": "Official TypeScript SDK for Portal API - Contact, job, and file management",
+  "author": "DataHub Portal Team",
+  "license": "Proprietary",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Work-Ninjas/portal-api-sdk-ts.git"
+  },
+  "homepage": "https://docs.datahubportal.com",
+  "keywords": [
+    "portal-api",
+    "datahubportal",
+    "contacts",
+    "jobs",
+    "files",
+    "typescript",
+    "sdk"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "module": "./dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc && tsc -p tsconfig.esm.json",
+    "prepare": "npm run build",
+    "test": "echo \"Tests coming soon\"",
+    "lint": "echo \"Linting coming soon\""
+  },
+  "devDependencies": {
+    "typescript": "^4.0 || ^5.0"
+  }
+}

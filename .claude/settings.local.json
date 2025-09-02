@@ -23,7 +23,8 @@
       "Bash(CONTAINER_APP_ID=\"/subscriptions/c4c5770f-c9b4-49db-ae81-fae53703aef5/resourceGroups/rg-data-migration-portal-prod/providers/Microsoft.App/containerapps/portal-api-prod\")",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npx @openapitools/openapi-generator-cli:*)"
     ],
     "deny": [],
     "ask": []

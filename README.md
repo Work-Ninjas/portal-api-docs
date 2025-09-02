@@ -1,5 +1,10 @@
 # Portal API — Docs, Contracts & Mocks
 
+[![Interactive Docs](https://img.shields.io/badge/📖_Interactive_Docs-live-brightgreen?style=flat-square)](https://docs.datahubportal.com)
+[![Try It Playground](https://img.shields.io/badge/🚀_Try_It-playground-blue?style=flat-square)](https://docs.datahubportal.com)
+[![API Status](https://img.shields.io/badge/API-online-brightgreen?style=flat-square&logo=statuspage&logoColor=white)](https://api.datahubportal.com/v1/health)
+[![OpenAPI v3.0.3](https://img.shields.io/badge/OpenAPI-3.0.3-green?style=flat-square&logo=swagger&logoColor=white)](https://docs.datahubportal.com/openapi/openapi.yaml)
+
 **API-first repository** for the Portal: OpenAPI spec, documentation (Stoplight), mocks (Prism), and Architecture Decision Records (ADRs).  
 This repo **does not** contain backend code. It defines contracts and governance so implementation can move fast without breaking clients.
 
