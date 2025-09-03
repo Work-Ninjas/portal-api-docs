@@ -1,0 +1,73 @@
+# Azure Container App configuration for Portal API Mock Server
+# Deploy with: az containerapp create --yaml containerapp.yaml
+
+location: eastus
+resourceGroup: rg-data-migration-portal-prod
+name: portal-api-mock
+properties:
+  environmentId: /subscriptions/c4c5770f-c9b4-49db-ae81-fae53703aef5/resourceGroups/rg-data-migration-portal-prod/providers/Microsoft.App/managedEnvironments/env-portal-prod
+  configuration:
+    activeRevisionsMode: Single
+    ingress:
+      external: true
+      targetPort: 3000
+      transport: http
+      corsPolicy:
+        allowedOrigins:
+          - "https://docs.datahubportal.com"
+          - "https://staging.docs.datahubportal.com"
+        allowedMethods:
+          - "GET"
+          - "POST" 
+          - "PUT"
+          - "DELETE"
+          - "OPTIONS"
+        allowedHeaders:
+          - "*"
+        allowCredentials: false
+    registries:
+      - server: portalregistry.azurecr.io
+        username: portalregistry
+        passwordSecretRef: registry-password
+    secrets:
+      - name: registry-password
+        value: "" # Set via Azure CLI or Portal
+  template:
+    containers:
+      - name: mock-server
+        image: portalregistry.azurecr.io/portal-api-mock:latest
+        env:
+          - name: NODE_ENV
+            value: "production"
+          - name: PRISM_LOG_LEVEL
+            value: "info"
+        resources:
+          cpu: 0.25
+          memory: "0.5Gi"
+        probes:
+          - type: liveness
+            httpGet:
+              path: "/v1/contacts"
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          - type: readiness
+            httpGet:
+              path: "/v1/contacts" 
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+    scale:
+      minReplicas: 1
+      maxReplicas: 3
+      rules:
+        - name: http-rule
+          http:
+            metadata:
+              concurrentRequests: "50"
+tags:
+  environment: "production"
+  service: "mock-api"
+  purpose: "documentation-testing"

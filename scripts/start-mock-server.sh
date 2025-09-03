@@ -18,6 +18,6 @@ echo "Starting mock server on http://localhost:4010"
 echo "Press Ctrl+C to stop the server"
 echo ""
 
-prism mock openapi/openapi.yaml --port 4010 --host 0.0.0.0
+prism mock openapi/openapi.mock.yaml --port 4010 --host 0.0.0.0 --dynamic --cors --errors
 
 echo "Mock server stopped."

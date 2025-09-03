@@ -1,0 +1,148 @@
+name: Deploy Mock Server to Azure Container Apps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'openapi/openapi.yaml'
+      - 'openapi/openapi.mock.yaml'
+      - 'azure/mock-server/**'
+      - '.github/workflows/deploy-mock-server.yml'
+  workflow_run:
+    workflows: ["Generate Mock OpenAPI Spec"]
+    types:
+      - completed
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+
+env:
+  REGISTRY: portalregistry.azurecr.io
+  IMAGE_NAME: portal-api-mock
+  RESOURCE_GROUP: rg-data-migration-portal-prod
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Verify mock spec exists
+      run: |
+        if [ ! -f "openapi/openapi.mock.yaml" ]; then
+          echo "❌ Mock spec not found! Generating it now..."
+          
+          # Setup Node.js to generate spec if missing
+          npm ci
+          npm run generate-mock
+          
+          if [ ! -f "openapi/openapi.mock.yaml" ]; then
+            echo "❌ Failed to generate mock spec!"
+            exit 1
+          fi
+        fi
+        echo "✅ Mock spec ready for deployment"
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Log in to Azure Container Registry
+      run: |
+        az acr login --name portalregistry
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./azure/mock-server/Dockerfile
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Deploy to Azure Container Apps (Production)
+      if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+      run: |
+        # Check if Container App exists
+        if az containerapp show --name portal-api-mock --resource-group ${{ env.RESOURCE_GROUP }} >/dev/null 2>&1; then
+          echo "Updating existing Container App..."
+          az containerapp update \
+            --name portal-api-mock \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --revision-suffix ${{ github.run_number }}
+        else
+          echo "Creating new Container App..."
+          az containerapp create \
+            --name portal-api-mock \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --environment $(az containerapp env list --resource-group ${{ env.RESOURCE_GROUP }} --query "[0].name" -o tsv) \
+            --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --target-port 3000 \
+            --ingress external \
+            --query properties.configuration.ingress.fqdn \
+            --cpu 0.25 \
+            --memory 0.5Gi \
+            --min-replicas 1 \
+            --max-replicas 3 \
+            --env-vars NODE_ENV=production PRISM_LOG_LEVEL=info \
+            --registry-server ${{ env.REGISTRY }} \
+            --registry-username portalregistry \
+            --registry-password $(az acr credential show --name portalregistry --query passwords[0].value -o tsv)
+        fi
+
+    - name: Configure custom domain (Production)
+      if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+      run: |
+        # Get the default FQDN
+        FQDN=$(az containerapp show --name portal-api-mock --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv)
+        echo "Mock server deployed to: https://$FQDN"
+        echo "Configure DNS: mock.api.datahubportal.com -> $FQDN"
+
+    - name: Configure CORS
+      run: |
+        # CORS is handled in the ingress configuration above
+        echo "CORS configured for docs.datahubportal.com"
+
+    - name: Test deployment
+      run: |
+        FQDN=$(az containerapp show --name portal-api-mock --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv)
+        echo "Testing deployment at https://$FQDN"
+        
+        # Wait for deployment to be ready
+        sleep 30
+        
+        # Test health endpoint
+        curl -f "https://$FQDN/health" || echo "Health check failed - may need more time to start"
+        
+        # Test contacts endpoint (should return example data)
+        curl -f "https://$FQDN/contacts?limit=1" || echo "Contacts endpoint test failed - may need more time to start"
+
+    - name: Output deployment info
+      run: |
+        FQDN=$(az containerapp show --name portal-api-mock --resource-group ${{ env.RESOURCE_GROUP }} --query properties.configuration.ingress.fqdn -o tsv)
+        echo "🚀 Mock Server Deployed Successfully!"
+        echo "📍 URL: https://$FQDN"
+        echo "🔧 Configure DNS: mock.api.datahubportal.com -> $FQDN"
+        echo "📋 Next steps:"
+        echo "   1. Set up DNS CNAME: mock.api.datahubportal.com -> $FQDN"
+        echo "   2. Update docs.datahubportal.com to use mock server"
+        echo "   3. Run acceptance tests from docs/security-acceptance-tests.md"

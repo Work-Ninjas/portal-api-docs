@@ -1,70 +1,109 @@
 openapi: 3.0.3
 info:
-  title: Portal API
-  description: |
+  title: Portal API (Mock Server)
+  description: >-
     Portal API provides secure access to contact, job, and file management resources.
+
     This API uses bearer token authentication and multi-tenant architecture.
-    
+
+
     ## Authentication
-    
-    The Portal API uses Bearer Token authentication with strict validation. Include your API key in the `Authorization` header:
-    
+
+
+    The Portal API uses Bearer Token authentication with strict validation. Include your API key in the `Authorization`
+    header:
+
+
     ```
+
     Authorization: Bearer your_api_key_here
+
     ```
-    
+
+
     **Environment-Specific Tokens**:
+
     - **Production**: Only accepts tokens with prefix `dhp_live_` 
+
     - **Staging**: Only accepts tokens with prefix `dhp_stg_`
+
     - **Mock Server**: No authentication required (returns example data only)
-    
-    **Important**: Keep your API key secure and never expose it in client-side code. All requests without valid tokens will return `401 Unauthorized`.
-    
+
+
+    **Important**: Keep your API key secure and never expose it in client-side code. All requests without valid tokens
+    will return `401 Unauthorized`.
+
+
     ## Getting Your API Key
-    
+
+
     1. Log in to [DataHub Portal](https://datahubportal.com)
+
     2. Go to **Settings** → **API Keys**
+
     3. Click **"Generate New API Key"**
+
     4. Copy and securely store your key (it won't be shown again)
+
     5. Set the key as an environment variable: `API_KEY=your_key`
-    
+
+
     **Need help?** See the complete [API Key Guide](./docs/getting-api-key.md)
-    
+
+
     ## Rate Limits
-    
+
+
     - **Per Client**: 420 requests/minute (burst: 60/30s)
+
     - **Per IP**: 60 requests/minute (burst: 30/30s)  
+
     - **Files Endpoint**: 120 requests/minute per client
+
     - **Daily Quota**: 100,000 requests per client
-    
+
+
     Rate limit headers are included in responses:
+
     - `X-RateLimit-Limit`: Request limit per window
+
     - `X-RateLimit-Remaining`: Remaining requests in window
+
     - `X-RateLimit-Reset`: Time when the rate limit resets
-    
+
+
     ## Official SDKs
-    
+
+
     - **TypeScript/JavaScript**: [@datahubportal/portal-api](https://www.npmjs.com/package/@datahubportal/portal-api)
+
     - **Python**: [datahub-portal-api](https://pypi.org/project/datahub-portal-api)
+
     - **Quickstarts**: [SDK Documentation](./docs/quickstarts.md)
+
+          
+    ## 🚨 MOCK SERVER SPECIFICATION
+
+
+    This is a derived specification for the mock server only. 
+
+    - **No authentication required**
+
+    - **Returns example data only**
+
+    - **For testing and documentation purposes**
+
+
+    For production/staging APIs, use the main specification with authentication.
   version: 1.0.0
   contact:
     name: API Support
     email: api-support@datahubportal.com
   license:
     name: Proprietary
-    
 servers:
-  - url: https://api.datahubportal.com/v1
-    description: Production
-  - url: https://api.staging.datahubportal.com/v1
-    description: Staging
   - url: https://mock.api.datahubportal.com
     description: Mock (no auth, example data)
-
-security:
-  - BearerAuth: []
-
 tags:
   - name: Contacts
     description: Contact management operations
@@ -74,7 +113,6 @@ tags:
     description: File and document management
   - name: System
     description: System health and status operations
-
 paths:
   /contacts:
     get:
@@ -201,7 +239,6 @@ paths:
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
-
   /contacts/{id}:
     get:
       tags:
@@ -276,8 +313,8 @@ paths:
           description: Contact identifier
           schema:
             type: string
-            pattern: '^con_[a-z0-9]{8}$'
-            example: "con_a1b2c3d4"
+            pattern: ^con_[a-z0-9]{8}$
+            example: con_a1b2c3d4
       responses:
         '200':
           description: Successfully retrieved contact
@@ -289,43 +326,45 @@ paths:
                 fullContact:
                   summary: Contact with all fields
                   value:
-                    id: "con_a1b2c3d4"
-                    name: "John Smith"
-                    company: "Acme Corp"
+                    id: con_a1b2c3d4
+                    name: John Smith
+                    company: Acme Corp
                     emails:
-                      - email: "john@acme.com"
-                        type: "work"
+                      - email: john@acme.com
+                        type: work
                         is_primary: true
-                      - email: "john.smith@personal.com"
-                        type: "personal"
+                      - email: john.smith@personal.com
+                        type: personal
                         is_primary: false
                     phones:
-                      - phone: "+14155551234"
-                        type: "mobile"
+                      - phone: '+14155551234'
+                        type: mobile
                         is_primary: true
-                      - phone: "+14155555678"
-                        type: "work"
+                      - phone: '+14155555678'
+                        type: work
                         is_primary: false
                     address:
-                      street: "123 Main St"
-                      city: "San Francisco"
-                      state: "CA"
-                      postal_code: "94105"
-                      country: "US"
-                    tags: ["vip", "contractor"]
-                    created_at: "2024-01-15T10:30:00Z"
-                    updated_at: "2024-01-20T14:45:00Z"
+                      street: 123 Main St
+                      city: San Francisco
+                      state: CA
+                      postal_code: '94105'
+                      country: US
+                    tags:
+                      - vip
+                      - contractor
+                    created_at: '2024-01-15T10:30:00Z'
+                    updated_at: '2024-01-20T14:45:00Z'
                 minimalContact:
                   summary: Contact with minimal fields
                   value:
-                    id: "con_e5f6g7h8"
-                    name: "Jane Doe"
+                    id: con_e5f6g7h8
+                    name: Jane Doe
                     emails:
-                      - email: "jane@example.com"
-                        type: "personal"
+                      - email: jane@example.com
+                        type: personal
                         is_primary: true
-                    created_at: "2024-01-14T09:15:00Z"
-                    updated_at: "2024-01-14T09:15:00Z"
+                    created_at: '2024-01-14T09:15:00Z'
+                    updated_at: '2024-01-14T09:15:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -338,7 +377,6 @@ paths:
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
-
   /jobs:
     get:
       tags:
@@ -421,8 +459,16 @@ paths:
           description: Filter by job status
           schema:
             type: string
-            enum: [open, scheduled, in_progress, blocked, awaiting_review, completed, canceled, archived]
-          example: "in_progress"
+            enum:
+              - open
+              - scheduled
+              - in_progress
+              - blocked
+              - awaiting_review
+              - completed
+              - canceled
+              - archived
+          example: in_progress
       responses:
         '200':
           description: Successfully retrieved jobs
@@ -442,25 +488,25 @@ paths:
                   summary: List of active jobs
                   value:
                     data:
-                      - id: "job_x1y2z3a4"
-                        title: "HVAC Maintenance - Building A"
-                        status: "in_progress"
-                        status_updated_at: "2024-01-20T08:00:00Z"
-                        priority: "high"
-                        contact_id: "con_a1b2c3d4"
-                        scheduled_start: "2024-01-20T09:00:00Z"
-                        scheduled_end: "2024-01-20T17:00:00Z"
-                        created_at: "2024-01-18T14:30:00Z"
-                        updated_at: "2024-01-20T08:00:00Z"
-                      - id: "job_b5c6d7e8"
-                        title: "Electrical Inspection"
-                        status: "scheduled"
-                        status_updated_at: "2024-01-19T16:00:00Z"
-                        priority: "medium"
-                        contact_id: "con_e5f6g7h8"
-                        scheduled_start: "2024-01-25T10:00:00Z"
-                        created_at: "2024-01-19T16:00:00Z"
-                        updated_at: "2024-01-19T16:00:00Z"
+                      - id: job_x1y2z3a4
+                        title: HVAC Maintenance - Building A
+                        status: in_progress
+                        status_updated_at: '2024-01-20T08:00:00Z'
+                        priority: high
+                        contact_id: con_a1b2c3d4
+                        scheduled_start: '2024-01-20T09:00:00Z'
+                        scheduled_end: '2024-01-20T17:00:00Z'
+                        created_at: '2024-01-18T14:30:00Z'
+                        updated_at: '2024-01-20T08:00:00Z'
+                      - id: job_b5c6d7e8
+                        title: Electrical Inspection
+                        status: scheduled
+                        status_updated_at: '2024-01-19T16:00:00Z'
+                        priority: medium
+                        contact_id: con_e5f6g7h8
+                        scheduled_start: '2024-01-25T10:00:00Z'
+                        created_at: '2024-01-19T16:00:00Z'
+                        updated_at: '2024-01-19T16:00:00Z'
                     total: 23
                     limit: 25
                     offset: 0
@@ -469,15 +515,15 @@ paths:
                   summary: Jobs with blocked status
                   value:
                     data:
-                      - id: "job_f9g0h1i2"
-                        title: "Plumbing Repair - Floor 3"
-                        status: "blocked"
-                        status_reason: "Awaiting parts delivery"
-                        status_updated_at: "2024-01-19T11:30:00Z"
-                        priority: "high"
-                        contact_id: "con_a1b2c3d4"
-                        created_at: "2024-01-17T09:00:00Z"
-                        updated_at: "2024-01-19T11:30:00Z"
+                      - id: job_f9g0h1i2
+                        title: Plumbing Repair - Floor 3
+                        status: blocked
+                        status_reason: Awaiting parts delivery
+                        status_updated_at: '2024-01-19T11:30:00Z'
+                        priority: high
+                        contact_id: con_a1b2c3d4
+                        created_at: '2024-01-17T09:00:00Z'
+                        updated_at: '2024-01-19T11:30:00Z'
                     total: 3
                     limit: 25
                     offset: 0
@@ -502,7 +548,6 @@ paths:
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
-
   /jobs/{jobId}/files:
     get:
       tags:
@@ -577,8 +622,8 @@ paths:
           description: Job identifier
           schema:
             type: string
-            pattern: '^job_[a-z0-9]{8}$'
-            example: "job_x1y2z3a4"
+            pattern: ^job_[a-z0-9]{8}$
+            example: job_x1y2z3a4
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
         - name: kind
@@ -586,8 +631,13 @@ paths:
           description: Filter by file kind
           schema:
             type: string
-            enum: [document, photo, invoice, report, other]
-          example: "photo"
+            enum:
+              - document
+              - photo
+              - invoice
+              - report
+              - other
+          example: photo
       responses:
         '200':
           description: Successfully retrieved job files
@@ -607,22 +657,22 @@ paths:
                   summary: Job with multiple files
                   value:
                     data:
-                      - id: "file_m3n4o5p6"
-                        name: "site_photo_001.jpg"
-                        kind: "photo"
+                      - id: file_m3n4o5p6
+                        name: site_photo_001.jpg
+                        kind: photo
                         size: 2457600
-                        mime_type: "image/jpeg"
-                        signed_url: "https://storage.example.com/files/abc123?token=xyz&expires=1705745400"
-                        expires_at: "2024-01-20T10:30:00Z"
-                        created_at: "2024-01-20T10:15:00Z"
-                      - id: "file_q7r8s9t0"
-                        name: "work_order.pdf"
-                        kind: "document"
+                        mime_type: image/jpeg
+                        signed_url: https://storage.example.com/files/abc123?token=xyz&expires=1705745400
+                        expires_at: '2024-01-20T10:30:00Z'
+                        created_at: '2024-01-20T10:15:00Z'
+                      - id: file_q7r8s9t0
+                        name: work_order.pdf
+                        kind: document
                         size: 145238
-                        mime_type: "application/pdf"
-                        signed_url: "https://storage.example.com/files/def456?token=abc&expires=1705745400"
-                        expires_at: "2024-01-20T10:30:00Z"
-                        created_at: "2024-01-19T14:00:00Z"
+                        mime_type: application/pdf
+                        signed_url: https://storage.example.com/files/def456?token=abc&expires=1705745400
+                        expires_at: '2024-01-20T10:30:00Z'
+                        created_at: '2024-01-19T14:00:00Z'
                     total: 5
                     limit: 25
                     offset: 0
@@ -631,14 +681,14 @@ paths:
                   summary: Files with URLs expiring soon
                   value:
                     data:
-                      - id: "file_u1v2w3x4"
-                        name: "inspection_report.pdf"
-                        kind: "report"
+                      - id: file_u1v2w3x4
+                        name: inspection_report.pdf
+                        kind: report
                         size: 523456
-                        mime_type: "application/pdf"
-                        signed_url: "https://storage.example.com/files/ghi789?token=qrs&expires=1705744500"
-                        expires_at: "2024-01-20T10:15:00Z"
-                        created_at: "2024-01-18T11:00:00Z"
+                        mime_type: application/pdf
+                        signed_url: https://storage.example.com/files/ghi789?token=qrs&expires=1705744500
+                        expires_at: '2024-01-20T10:15:00Z'
+                        created_at: '2024-01-18T11:00:00Z'
                     total: 1
                     limit: 25
                     offset: 0
@@ -663,7 +713,6 @@ paths:
           $ref: '#/components/responses/RateLimited'
         '500':
           $ref: '#/components/responses/InternalError'
-
   /health:
     get:
       tags:
@@ -671,7 +720,6 @@ paths:
       summary: Health check endpoint
       description: Returns system health status and configuration indicators
       operationId: getHealthStatus
-      security: []  # No authentication required for health check
       responses:
         '200':
           description: System health information
@@ -687,13 +735,18 @@ paths:
                 properties:
                   status:
                     type: string
-                    enum: [healthy, degraded, unhealthy]
-                    example: "healthy"
+                    enum:
+                      - healthy
+                      - degraded
+                      - unhealthy
+                    example: healthy
                   authMode:
                     type: string
-                    enum: [strict, permissive]
+                    enum:
+                      - strict
+                      - permissive
                     description: Authentication mode indicator
-                    example: "strict"
+                    example: strict
                   mockMode:
                     type: boolean
                     description: Whether mock data is enabled
@@ -701,17 +754,16 @@ paths:
                   timestamp:
                     type: string
                     format: date-time
-                    example: "2024-01-20T10:30:00Z"
+                    example: '2024-01-20T10:30:00Z'
                   version:
                     type: string
-                    example: "1.0.0"
+                    example: 1.0.0
               example:
-                status: "healthy"
-                authMode: "strict"
+                status: healthy
+                authMode: strict
                 mockMode: false
-                timestamp: "2024-01-20T10:30:00Z"
-                version: "1.0.0"
-
+                timestamp: '2024-01-20T10:30:00Z'
+                version: 1.0.0
 components:
   securitySchemes:
     BearerAuth:
@@ -723,7 +775,6 @@ components:
         - Production: `dhp_live_` prefix required
         - Staging: `dhp_stg_` prefix required
         - All tokens validated with constant-time comparison
-
   parameters:
     limit:
       name: limit
@@ -735,7 +786,6 @@ components:
         maximum: 100
         default: 25
       example: 25
-    
     offset:
       name: offset
       in: query
@@ -745,27 +795,31 @@ components:
         minimum: 0
         default: 0
       example: 0
-    
     sort:
       name: sort
       in: query
       description: Field to sort by
       schema:
         type: string
-        enum: [created_at, updated_at, name, status, priority]
+        enum:
+          - created_at
+          - updated_at
+          - name
+          - status
+          - priority
         default: created_at
       example: created_at
-    
     dir:
       name: dir
       in: query
       description: Sort direction
       schema:
         type: string
-        enum: [asc, desc]
+        enum:
+          - asc
+          - desc
         default: desc
       example: desc
-    
     q:
       name: q
       in: query
@@ -774,8 +828,7 @@ components:
         type: string
         minLength: 1
         maxLength: 100
-      example: "smith"
-
+      example: smith
   schemas:
     Contact:
       type: object
@@ -788,17 +841,17 @@ components:
       properties:
         id:
           type: string
-          pattern: '^con_[a-z0-9]{8}$'
+          pattern: ^con_[a-z0-9]{8}$
           description: Unique contact identifier
-          example: "con_a1b2c3d4"
+          example: con_a1b2c3d4
         name:
           type: string
           description: Full name of the contact
-          example: "John Smith"
+          example: John Smith
         company:
           type: string
           description: Company or organization name
-          example: "Acme Corp"
+          example: Acme Corp
         emails:
           type: array
           minItems: 1
@@ -813,35 +866,36 @@ components:
           properties:
             street:
               type: string
-              example: "123 Main St"
+              example: 123 Main St
             city:
               type: string
-              example: "San Francisco"
+              example: San Francisco
             state:
               type: string
-              example: "CA"
+              example: CA
             postal_code:
               type: string
-              example: "94105"
+              example: '94105'
             country:
               type: string
-              example: "US"
+              example: US
         tags:
           type: array
           items:
             type: string
-          example: ["vip", "contractor"]
+          example:
+            - vip
+            - contractor
         created_at:
           type: string
           format: date-time
           description: ISO 8601 timestamp
-          example: "2024-01-15T10:30:00Z"
+          example: '2024-01-15T10:30:00Z'
         updated_at:
           type: string
           format: date-time
           description: ISO 8601 timestamp
-          example: "2024-01-20T14:45:00Z"
-
+          example: '2024-01-20T14:45:00Z'
     ContactEmail:
       type: object
       required:
@@ -852,15 +906,17 @@ components:
         email:
           type: string
           format: email
-          example: "john@example.com"
+          example: john@example.com
         type:
           type: string
-          enum: [work, personal, other]
-          example: "work"
+          enum:
+            - work
+            - personal
+            - other
+          example: work
         is_primary:
           type: boolean
           example: true
-
     ContactPhone:
       type: object
       required:
@@ -870,17 +926,20 @@ components:
       properties:
         phone:
           type: string
-          pattern: '^\+[1-9]\d{1,14}$'
+          pattern: ^\+[1-9]\d{1,14}$
           description: E.164 format
-          example: "+14155551234"
+          example: '+14155551234'
         type:
           type: string
-          enum: [mobile, work, home, other]
-          example: "mobile"
+          enum:
+            - mobile
+            - work
+            - home
+            - other
+          example: mobile
         is_primary:
           type: boolean
           example: true
-
     Job:
       type: object
       required:
@@ -895,62 +954,69 @@ components:
       properties:
         id:
           type: string
-          pattern: '^job_[a-z0-9]{8}$'
+          pattern: ^job_[a-z0-9]{8}$
           description: Unique job identifier
-          example: "job_x1y2z3a4"
+          example: job_x1y2z3a4
         title:
           type: string
           description: Job title or description
-          example: "HVAC Maintenance - Building A"
+          example: HVAC Maintenance - Building A
         status:
           $ref: '#/components/schemas/JobStatus'
         status_reason:
           type: string
           description: Optional reason for status (especially for blocked)
-          example: "Awaiting parts delivery"
+          example: Awaiting parts delivery
         status_updated_at:
           type: string
           format: date-time
           description: When status last changed
-          example: "2024-01-20T08:00:00Z"
+          example: '2024-01-20T08:00:00Z'
         priority:
           type: string
-          enum: [low, medium, high, urgent]
-          example: "high"
+          enum:
+            - low
+            - medium
+            - high
+            - urgent
+          example: high
         contact_id:
           type: string
-          pattern: '^con_[a-z0-9]{8}$'
+          pattern: ^con_[a-z0-9]{8}$
           description: Associated contact ID
-          example: "con_a1b2c3d4"
+          example: con_a1b2c3d4
         scheduled_start:
           type: string
           format: date-time
           description: Scheduled start time
-          example: "2024-01-20T09:00:00Z"
+          example: '2024-01-20T09:00:00Z'
         scheduled_end:
           type: string
           format: date-time
           description: Scheduled end time
-          example: "2024-01-20T17:00:00Z"
+          example: '2024-01-20T17:00:00Z'
         assignee_ids:
           type: array
           items:
             type: string
-          example: ["usr_abc123", "usr_def456"]
+          example:
+            - usr_abc123
+            - usr_def456
         tags:
           type: array
           items:
             type: string
-          example: ["maintenance", "hvac"]
+          example:
+            - maintenance
+            - hvac
         created_at:
           type: string
           format: date-time
-          example: "2024-01-18T14:30:00Z"
+          example: '2024-01-18T14:30:00Z'
         updated_at:
           type: string
           format: date-time
-          example: "2024-01-20T08:00:00Z"
-
+          example: '2024-01-20T08:00:00Z'
     FileAsset:
       type: object
       required:
@@ -965,13 +1031,13 @@ components:
       properties:
         id:
           type: string
-          pattern: '^file_[a-z0-9]{8}$'
+          pattern: ^file_[a-z0-9]{8}$
           description: Unique file identifier
-          example: "file_m3n4o5p6"
+          example: file_m3n4o5p6
         name:
           type: string
           description: Original filename
-          example: "site_photo_001.jpg"
+          example: site_photo_001.jpg
         kind:
           $ref: '#/components/schemas/FileKind'
         size:
@@ -981,17 +1047,17 @@ components:
         mime_type:
           type: string
           description: MIME type
-          example: "image/jpeg"
+          example: image/jpeg
         signed_url:
           type: string
           format: uri
           description: Temporary signed URL for file access
-          example: "https://storage.example.com/files/abc123?token=xyz&expires=1705745400"
+          example: https://storage.example.com/files/abc123?token=xyz&expires=1705745400
         expires_at:
           type: string
           format: date-time
           description: When the signed URL expires (typically 15 minutes)
-          example: "2024-01-20T10:30:00Z"
+          example: '2024-01-20T10:30:00Z'
         metadata:
           type: object
           additionalProperties: true
@@ -999,8 +1065,7 @@ components:
         created_at:
           type: string
           format: date-time
-          example: "2024-01-20T10:15:00Z"
-
+          example: '2024-01-20T10:15:00Z'
     PaginationResponse:
       type: object
       required:
@@ -1025,7 +1090,6 @@ components:
           type: boolean
           description: Whether more items exist
           example: true
-
     Error:
       type: object
       required:
@@ -1040,11 +1104,11 @@ components:
           type: string
           format: uri
           description: URI reference for error type
-          example: "https://api.portal.example.com/errors/validation"
+          example: https://api.portal.example.com/errors/validation
         title:
           type: string
           description: Short error description
-          example: "Validation Error"
+          example: Validation Error
         status:
           type: integer
           description: HTTP status code
@@ -1052,21 +1116,20 @@ components:
         code:
           type: string
           description: Application-specific error code
-          example: "VALIDATION_FAILED"
+          example: VALIDATION_FAILED
         detail:
           type: string
           description: Detailed error message
-          example: "The provided email format is invalid"
+          example: The provided email format is invalid
         traceId:
           type: string
           description: Request trace identifier for debugging
-          example: "abc123-def456-ghi789"
+          example: abc123-def456-ghi789
         errors:
           type: array
           description: Field-specific validation errors
           items:
             $ref: '#/components/schemas/ValidationError'
-
     ValidationError:
       type: object
       required:
@@ -1076,53 +1139,59 @@ components:
         field:
           type: string
           description: Field name that failed validation
-          example: "email"
+          example: email
         message:
           type: string
           description: Validation error message
-          example: "Must be a valid email address"
+          example: Must be a valid email address
         code:
           type: string
           description: Validation rule that failed
-          example: "format.email"
-
+          example: format.email
     JobStatus:
       type: string
-      enum: [open, scheduled, in_progress, blocked, awaiting_review, completed, canceled, archived]
+      enum:
+        - open
+        - scheduled
+        - in_progress
+        - blocked
+        - awaiting_review
+        - completed
+        - canceled
+        - archived
       description: Canonical job status values
-      example: "in_progress"
-
+      example: in_progress
     FileKind:
       type: string
-      enum: [document, photo, invoice, report, other]
+      enum:
+        - document
+        - photo
+        - invoice
+        - report
+        - other
       description: File classification types
-      example: "photo"
-
+      example: photo
   headers:
     X-RateLimit-Limit:
       description: The number of requests allowed in the current window
       schema:
         type: integer
         example: 60
-    
     X-RateLimit-Remaining:
       description: The number of requests remaining in the current window
       schema:
         type: integer
         example: 45
-    
     X-RateLimit-Reset:
       description: Unix timestamp when the current window resets
       schema:
         type: integer
         example: 1705745400
-    
     Retry-After:
       description: Seconds until the client should retry the request
       schema:
         type: integer
         example: 30
-
   responses:
     BadRequest:
       description: Bad request - Invalid parameters
@@ -1131,13 +1200,12 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            type: "https://api.portal.example.com/errors/bad-request"
-            title: "Bad Request"
+            type: https://api.portal.example.com/errors/bad-request
+            title: Bad Request
             status: 400
-            code: "BAD_REQUEST"
-            detail: "Invalid query parameter format"
-            traceId: "req_abc123def456"
-
+            code: BAD_REQUEST
+            detail: Invalid query parameter format
+            traceId: req_abc123def456
     Unauthorized:
       description: Unauthorized - Missing or invalid authentication
       content:
@@ -1148,40 +1216,39 @@ components:
             missing_token:
               summary: Missing Authorization header
               value:
-                type: "https://api.datahubportal.com/errors/unauthorized"
-                title: "Unauthorized"
+                type: https://api.datahubportal.com/errors/unauthorized
+                title: Unauthorized
                 status: 401
-                code: "missing_token"
-                detail: "Authorization header is required"
-                traceId: "req_ghi789jkl012"
+                code: missing_token
+                detail: Authorization header is required
+                traceId: req_ghi789jkl012
             invalid_token_format:
               summary: Invalid token format
               value:
-                type: "https://api.datahubportal.com/errors/unauthorized"
-                title: "Unauthorized"
+                type: https://api.datahubportal.com/errors/unauthorized
+                title: Unauthorized
                 status: 401
-                code: "invalid_token_format"
-                detail: "Bearer token format is invalid"
-                traceId: "req_abc123def456"
+                code: invalid_token_format
+                detail: Bearer token format is invalid
+                traceId: req_abc123def456
             wrong_environment_token:
               summary: Wrong environment token
               value:
-                type: "https://api.datahubportal.com/errors/unauthorized"
-                title: "Unauthorized"
+                type: https://api.datahubportal.com/errors/unauthorized
+                title: Unauthorized
                 status: 401
-                code: "wrong_environment_token"
-                detail: "Token environment prefix does not match server environment"
-                traceId: "req_xyz789uvw012"
+                code: wrong_environment_token
+                detail: Token environment prefix does not match server environment
+                traceId: req_xyz789uvw012
             invalid_token:
               summary: Invalid or expired token
               value:
-                type: "https://api.datahubportal.com/errors/unauthorized"
-                title: "Unauthorized"
+                type: https://api.datahubportal.com/errors/unauthorized
+                title: Unauthorized
                 status: 401
-                code: "invalid_token"
-                detail: "Token is invalid, expired, or revoked"
-                traceId: "req_mno345pqr678"
-
+                code: invalid_token
+                detail: Token is invalid, expired, or revoked
+                traceId: req_mno345pqr678
     Forbidden:
       description: Forbidden - Insufficient permissions
       content:
@@ -1189,13 +1256,12 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            type: "https://api.portal.example.com/errors/forbidden"
-            title: "Forbidden"
+            type: https://api.portal.example.com/errors/forbidden
+            title: Forbidden
             status: 403
-            code: "FORBIDDEN"
-            detail: "Access denied for tenant"
-            traceId: "req_mno345pqr678"
-
+            code: FORBIDDEN
+            detail: Access denied for tenant
+            traceId: req_mno345pqr678
     NotFound:
       description: Not found - Resource does not exist
       content:
@@ -1203,13 +1269,12 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            type: "https://api.portal.example.com/errors/not-found"
-            title: "Not Found"
+            type: https://api.portal.example.com/errors/not-found
+            title: Not Found
             status: 404
-            code: "NOT_FOUND"
-            detail: "Resource not found"
-            traceId: "req_stu901vwx234"
-
+            code: NOT_FOUND
+            detail: Resource not found
+            traceId: req_stu901vwx234
     ValidationError:
       description: Validation error - Request validation failed
       content:
@@ -1217,17 +1282,16 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            type: "https://api.portal.example.com/errors/validation"
-            title: "Validation Error"
+            type: https://api.portal.example.com/errors/validation
+            title: Validation Error
             status: 422
-            code: "VALIDATION_FAILED"
-            detail: "Request validation failed"
-            traceId: "req_yza567bcd890"
+            code: VALIDATION_FAILED
+            detail: Request validation failed
+            traceId: req_yza567bcd890
             errors:
-              - field: "status"
-                message: "Invalid status value"
-                code: "enum.invalid"
-
+              - field: status
+                message: Invalid status value
+                code: enum.invalid
     RateLimited:
       description: Too many requests - Rate limit exceeded
       headers:
@@ -1244,13 +1308,12 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            type: "https://api.portal.example.com/errors/rate-limit"
-            title: "Too Many Requests"
+            type: https://api.portal.example.com/errors/rate-limit
+            title: Too Many Requests
             status: 429
-            code: "RATE_LIMIT_EXCEEDED"
-            detail: "Rate limit exceeded. Please retry after 30 seconds"
-            traceId: "req_efg123hij456"
-
+            code: RATE_LIMIT_EXCEEDED
+            detail: Rate limit exceeded. Please retry after 30 seconds
+            traceId: req_efg123hij456
     InternalError:
       description: Internal server error
       content:
@@ -1258,9 +1321,9 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            type: "https://api.portal.example.com/errors/internal"
-            title: "Internal Server Error"
+            type: https://api.portal.example.com/errors/internal
+            title: Internal Server Error
             status: 500
-            code: "INTERNAL_ERROR"
-            detail: "An unexpected error occurred"
-            traceId: "req_klm789nop012"
+            code: INTERNAL_ERROR
+            detail: An unexpected error occurred
+            traceId: req_klm789nop012

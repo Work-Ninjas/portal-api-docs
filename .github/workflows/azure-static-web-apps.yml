@@ -23,7 +23,7 @@ jobs:
       - name: Prepare documentation
         run: |
           # Copy OpenAPI spec to root for easy access
-          cp docs/openapi.yaml ./ || echo "OpenAPI spec not found, continuing..."
+          cp openapi/openapi.yaml ./ || echo "OpenAPI spec not found, continuing..."
           
       - name: Deploy to Azure Static Web Apps (Production)
         id: builddeploy
@@ -48,7 +48,7 @@ jobs:
       - name: Prepare staging documentation  
         run: |
           # Copy OpenAPI spec and staging robots.txt
-          cp docs/openapi.yaml ./ || echo "OpenAPI spec not found, continuing..."
+          cp openapi/openapi.yaml ./ || echo "OpenAPI spec not found, continuing..."
           cp staging/robots.txt ./ || echo "Staging robots.txt not found, using default..."
           
       - name: Deploy to Azure Static Web Apps (Staging)

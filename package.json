@@ -1,0 +1,22 @@
+{
+  "name": "portal-api-docs",
+  "version": "1.0.0",
+  "description": "Portal API Documentation and Mock Server",
+  "scripts": {
+    "generate-mock": "node scripts/generate-mock-spec.js",
+    "lint": "spectral lint openapi/openapi.yaml",
+    "lint-mock": "spectral lint openapi/openapi.mock.yaml",
+    "lint-all": "npm run lint && npm run lint-mock",
+    "mock-server": "./scripts/start-mock-server.sh",
+    "build": "npm run generate-mock && npm run lint-all"
+  },
+  "devDependencies": {
+    "@stoplight/spectral-cli": "^6.11.0"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "keywords": ["openapi", "api", "documentation", "mock"],
+  "author": "DataHub Portal Team",
+  "license": "Proprietary"
+}

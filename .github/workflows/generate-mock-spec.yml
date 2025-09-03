@@ -1,0 +1,108 @@
+name: Generate Mock OpenAPI Spec
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+    paths:
+      - 'openapi/openapi.yaml'
+      - 'scripts/generate-mock-spec.js'
+      - '.github/workflows/generate-mock-spec.yml'
+  pull_request:
+    paths:
+      - 'openapi/openapi.yaml'
+      - 'scripts/generate-mock-spec.js'
+      - '.github/workflows/generate-mock-spec.yml'
+  workflow_dispatch:
+
+jobs:
+  generate-mock-spec:
+    runs-on: ubuntu-latest
+    name: Generate and Validate Mock Spec
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate mock specification
+        run: npm run generate-mock
+
+      - name: Lint original specification
+        run: npm run lint
+
+      - name: Lint mock specification
+        run: npm run lint-mock
+
+      - name: Verify mock spec exists
+        run: |
+          if [ ! -f "openapi/openapi.mock.yaml" ]; then
+            echo "❌ Mock spec was not generated!"
+            exit 1
+          fi
+          echo "✅ Mock spec generated successfully"
+
+      - name: Check mock spec has no security
+        run: |
+          if grep -q "^security:" openapi/openapi.mock.yaml; then
+            echo "❌ Mock spec still contains global security requirement!"
+            exit 1
+          fi
+          echo "✅ Mock spec has no global security requirement"
+
+      - name: Check mock spec server
+        run: |
+          if ! grep -q "mock.api.datahubportal.com" openapi/openapi.mock.yaml; then
+            echo "❌ Mock spec does not contain correct server URL!"
+            exit 1
+          fi
+          echo "✅ Mock spec contains correct server URL"
+
+      - name: Upload mock spec as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-mock-spec
+          path: openapi/openapi.mock.yaml
+          retention-days: 30
+
+      - name: Commit updated mock spec (if on main)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if ! git diff --quiet openapi/openapi.mock.yaml; then
+            git add openapi/openapi.mock.yaml
+            git commit -m "chore: update mock spec from openapi.yaml changes
+            
+            🤖 Generated with [Claude Code](https://claude.ai/code)
+            
+            Co-Authored-By: Claude <noreply@anthropic.com>"
+            git push
+            echo "✅ Mock spec committed and pushed"
+          else
+            echo "✅ No changes to mock spec"
+          fi
+
+      - name: Summary
+        run: |
+          echo "## 📋 Mock Spec Generation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Mock specification generated successfully**" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Both specs pass Spectral linting**" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Mock spec validated (no security, correct server)**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📁 Generated Files" >> $GITHUB_STEP_SUMMARY
+          echo "- \`openapi/openapi.mock.yaml\` - Mock server specification" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "- Mock server deployment will use the generated spec" >> $GITHUB_STEP_SUMMARY
+          echo "- Spec available as build artifact for 30 days" >> $GITHUB_STEP_SUMMARY
