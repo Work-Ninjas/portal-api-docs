@@ -30,11 +30,11 @@ info:
     name: Proprietary
     
 servers:
-  - url: https://api.datahubportal.com/v1
+  - url: https://api.datahubportal.com
     description: Production server
-  - url: https://api.staging.datahubportal.com/v1
+  - url: https://api.staging.datahubportal.com
     description: Staging server  
-  - url: http://localhost:3000/v1
+  - url: http://localhost:3000
     description: Local development server
 
 security:
