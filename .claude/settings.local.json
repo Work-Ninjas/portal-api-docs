@@ -26,7 +26,8 @@
       "Bash(git push:*)",
       "WebFetch(domain:docs.datahubportal.com)",
       "Bash(npx @stoplight/spectral-cli lint:*)",
-      "WebFetch(domain:gentle-mud-0c449720f.2.azurestaticapps.net)"
+      "WebFetch(domain:gentle-mud-0c449720f.2.azurestaticapps.net)",
+      "Read(//d//**)"
     ],
     "deny": [],
     "ask": []
