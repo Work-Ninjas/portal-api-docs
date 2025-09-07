@@ -77,6 +77,9 @@
             layout="sidebar"
             tryIt="true"
             tryItCorsProxy=""
+            hideSchemas="false"
+            hideExport="false"
+            hideDownloadButton="false"
             logo="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>"
         />
     </div>
@@ -118,16 +121,33 @@
 
         // Configure Stoplight Elements when it's ready
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 DOM loaded, initializing Stoplight Elements...');
+            
             const elements = document.getElementById('docs');
             
-            // Add custom event listeners for Try It functionality
-            elements.addEventListener('request-started', (event) => {
-                console.log('API request started:', event.detail);
-            });
-            
-            elements.addEventListener('request-finished', (event) => {
-                console.log('API request completed:', event.detail);
-            });
+            // Check if elements loaded
+            setTimeout(() => {
+                if (elements) {
+                    console.log('✅ Stoplight Elements found:', elements);
+                    
+                    // Add custom event listeners for Try It functionality
+                    elements.addEventListener('request-started', (event) => {
+                        console.log('🔄 API request started:', event.detail);
+                    });
+                    
+                    elements.addEventListener('request-finished', (event) => {
+                        console.log('✅ API request completed:', event.detail);
+                    });
+                    
+                    // Check for Try It buttons
+                    setTimeout(() => {
+                        const tryItButtons = document.querySelectorAll('[data-testid="try-it-btn"], button[class*="try"], button[class*="Try"]');
+                        console.log('🔍 Try It buttons found:', tryItButtons.length, tryItButtons);
+                    }, 3000);
+                } else {
+                    console.error('❌ Stoplight Elements not found!');
+                }
+            }, 1000);
         });
     </script>
 </body>
