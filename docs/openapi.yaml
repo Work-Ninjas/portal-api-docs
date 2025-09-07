@@ -297,7 +297,7 @@ paths:
                   summary: List of active jobs
                   value:
                     data:
-                      - id: "job_x1y2z3a4"
+                      - id: "bf4ab74f-830f-45ca-9466-8932e08d7303"
                         title: "HVAC Maintenance - Building A"
                         status: "in_progress"
                         status_updated_at: "2024-01-20T08:00:00Z"
@@ -307,7 +307,7 @@ paths:
                         scheduled_end: "2024-01-20T17:00:00Z"
                         created_at: "2024-01-18T14:30:00Z"
                         updated_at: "2024-01-20T08:00:00Z"
-                      - id: "job_b5c6d7e8"
+                      - id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
                         title: "Electrical Inspection"
                         status: "scheduled"
                         status_updated_at: "2024-01-19T16:00:00Z"
@@ -324,7 +324,7 @@ paths:
                   summary: Jobs with blocked status
                   value:
                     data:
-                      - id: "job_f9g0h1i2"
+                      - id: "c1d2e3f4-5678-9abc-def0-123456789abc"
                         title: "Plumbing Repair - Floor 3"
                         status: "blocked"
                         status_reason: "Awaiting parts delivery"
@@ -369,11 +369,11 @@ paths:
         - name: jobId
           in: path
           required: true
-          description: Job identifier
+          description: Job identifier (UUID format)
           schema:
             type: string
-            pattern: '^job_[a-z0-9]{8}$'
-          example: "job_x1y2z3a4"
+            format: uuid
+          example: "bf4ab74f-830f-45ca-9466-8932e08d7303"
       responses:
         '200':
           description: Successfully retrieved job
@@ -385,7 +385,7 @@ paths:
                 activeJob:
                   summary: Active job with details
                   value:
-                    id: "job_x1y2z3a4"
+                    id: "bf4ab74f-830f-45ca-9466-8932e08d7303"
                     title: "HVAC Maintenance - Building A"
                     status: "in_progress"
                     status_updated_at: "2024-01-20T08:00:00Z"
@@ -398,7 +398,7 @@ paths:
                 completedJob:
                   summary: Completed job
                   value:
-                    id: "job_b5c6d7e8"
+                    id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
                     title: "Electrical Inspection"
                     status: "completed"
                     status_updated_at: "2024-01-19T16:30:00Z"
@@ -432,11 +432,11 @@ paths:
         - name: jobId
           in: path
           required: true
-          description: Job identifier
+          description: Job identifier (UUID format)
           schema:
             type: string
-            pattern: '^job_[a-z0-9]{8}$'
-            example: "job_x1y2z3a4"
+            format: uuid
+            example: "bf4ab74f-830f-45ca-9466-8932e08d7303"
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
         - name: kind
@@ -1182,9 +1182,9 @@ components:
       properties:
         id:
           type: string
-          pattern: '^job_[a-z0-9]{8}$'
-          description: Unique job identifier
-          example: "job_x1y2z3a4"
+          format: uuid
+          description: Unique job identifier (UUID format)
+          example: "bf4ab74f-830f-45ca-9466-8932e08d7303"
         title:
           type: string
           description: Job title or description
